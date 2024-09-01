@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from account.serializers import UserRegistertionSerializer, UserLoginSerializer, UserProfileSerializer, UserChangePasswordSerializer, SendPasswordResetEmailSerializer
+from account.serializers import UserRegistertionSerializer, UserLoginSerializer, UserProfileSerializer, UserChangePasswordSerializer, SendPasswordResetEmailSerializer, UserPasswordResetSerializer
 from django.contrib.auth import authenticate
 from account.renderers import UserRenderers
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -25,6 +25,8 @@ class UserRegistertionView(APIView):
             token = get_tokens_for_user(user)
             return Response({"token":token, 'msg': 'Registration Successfully'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
 
 class UserLoginView(APIView):
     renderer_classes = [UserRenderers]
@@ -69,3 +71,37 @@ class SendPasswordEmailView(APIView):
             return Response({"msg":'Password Reset Link send. Please Check you email'}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
+class UserPasswordResetView(APIView):
+    renderer_classes = [UserRenderers]  # Ensure UserRenderers is defined and imported
+
+    def post(self, request, uuid, token, format=None):
+        serializer = UserPasswordResetSerializer(data=request.data, context={'uuid': uuid, 'token': token})
+        if serializer.is_valid(raise_exception=True):
+            return Response({'msg': "Password reset successfully"}, status=status.HTTP_200_OK)
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# class UserPasswordResetView(APIView):
+#     renderer_classes = [UserRenderers]
+#     def post(self, request, uuid, token, format = None):
+#         serilizer = UserPasswordResetSerializer(data=request.data, context={'uuid':uuid, 'token': token})
+#         if serilizer.is_valid(raise_exception=True):
+#             return Response({'msg' : "User Create Password Successfully"}, status=status.HTTP_200_OK)
+#         return Response(serilizer.errors, status=status.HTTP_400_BAD_REQUEST)
